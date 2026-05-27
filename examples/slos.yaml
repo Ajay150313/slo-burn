@@ -1,0 +1,142 @@
+# slo-burn example config
+# Copy this, fill in your service names and API keys, and run:
+#   slo-burn serve --config slos.yaml
+
+backends:
+  prometheus:
+    url: http://prometheus:9090   # or your Thanos/Mimir URL
+
+# Optional — controls the web dashboard and metrics endpoint
+server:
+  port: 9000          # dashboard
+  metrics_port: 9090  # Prometheus metrics
+
+slos:
+
+  # ── 1. HTTP availability ─────────────────────────────────────────────────
+  - name: checkout-api-availability
+    description: "99.9% of checkout requests must succeed (30d rolling)"
+    target: 99.9
+    window_days: 30
+    backend: prometheus
+    labels:
+      team: payments
+      tier: "1"
+
+    indicators:
+      good_query: |
+        sum(rate(http_requests_total{
+          service="checkout",
+          code!~"5.."
+        }[{window}]))
+      total_query: |
+        sum(rate(http_requests_total{
+          service="checkout"
+        }[{window}]))
+
+    alerts:
+      # Page: budget exhausted in ~50h at this rate
+      - severity: page
+        short_window: 1h
+        long_window:  5h
+        multiplier:   14x
+
+      # Ticket: budget exhausted in ~10d at this rate
+      - severity: ticket
+        short_window: 6h
+        long_window:  3d
+        multiplier:   3x
+
+    notify:
+      - type: pagerduty
+        integration_key: ${PD_CHECKOUT_KEY}
+      - type: slack
+        webhook_url: ${SLACK_WEBHOOK}
+        channel: "#payments-oncall"
+
+  # ── 2. HTTP latency ──────────────────────────────────────────────────────
+  - name: checkout-api-latency
+    description: "99% of checkout requests must complete in < 500ms"
+    target: 99.0
+    window_days: 30
+    backend: prometheus
+
+    indicators:
+      # Good events = requests that finished within the latency budget
+      good_query: |
+        sum(rate(http_request_duration_seconds_bucket{
+          service="checkout",
+          le="0.5"
+        }[{window}]))
+      total_query: |
+        sum(rate(http_request_duration_seconds_count{
+          service="checkout"
+        }[{window}]))
+
+    alerts:
+      - severity: page
+        short_window: 1h
+        long_window:  5h
+        multiplier:   14x
+      - severity: ticket
+        short_window: 6h
+        long_window:  3d
+        multiplier:   3x
+
+    notify:
+      - type: slack
+        webhook_url: ${SLACK_WEBHOOK}
+        channel: "#payments-oncall"
+
+  # ── 3. gRPC service ──────────────────────────────────────────────────────
+  - name: inventory-grpc-availability
+    description: "Inventory gRPC service availability"
+    target: 99.95
+    window_days: 30
+    backend: prometheus
+
+    indicators:
+      good_query: |
+        sum(rate(grpc_server_handled_total{
+          grpc_service="inventory.InventoryService",
+          grpc_code="OK"
+        }[{window}]))
+      total_query: |
+        sum(rate(grpc_server_handled_total{
+          grpc_service="inventory.InventoryService"
+        }[{window}]))
+
+    # No alerts defined → uses Google SRE Workbook defaults (14.4× / 3×)
+
+    notify:
+      - type: pagerduty
+        integration_key: ${PD_INVENTORY_KEY}
+
+  # ── 4. Message queue ─────────────────────────────────────────────────────
+  - name: order-events-processing
+    description: "Order event processing success rate"
+    target: 99.9
+    window_days: 30
+    backend: prometheus
+
+    indicators:
+      good_query: |
+        sum(rate(queue_messages_processed_total{
+          queue="order-events",
+          status="success"
+        }[{window}]))
+      total_query: |
+        sum(rate(queue_messages_processed_total{
+          queue="order-events"
+        }[{window}]))
+
+    alerts:
+      - severity: ticket
+        short_window: 6h
+        long_window:  3d
+        multiplier:   3x
+
+    notify:
+      - type: slack
+        webhook_url: ${SLACK_WEBHOOK}
+        channel: "#platform-alerts"
