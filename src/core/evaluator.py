@@ -1,6 +1,5 @@
-# Copyright 2026 Ajay Mulukutla (Ajay150313)
+# Copyright 2026 Ajay Devineni (Ajay150313)
 # MIT License — see LICENSE in the project root
-
 
 """
 Multi-window burn rate evaluator.
@@ -21,7 +20,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Protocol, runtime_checkable
 
 from .models import (
@@ -35,6 +34,10 @@ from .models import (
 )
 
 log = logging.getLogger(__name__)
+
+# Single source of truth for UTC — avoids repeated tz= arg and the
+# now-deprecated datetime.utcnow() which is removed in Python 3.12.
+_UTC = timezone.utc
 
 
 @runtime_checkable
@@ -98,7 +101,7 @@ class BurnRateEvaluator:
             except Exception:
                 log.exception(
                     "Failed evaluating threshold %s for SLO %s",
-                    threshold.name, slo.name
+                    threshold.name, slo.name,
                 )
         return results
 
@@ -118,9 +121,9 @@ class BurnRateEvaluator:
 
     async def compute_error_budget(self, slo: SLO) -> ErrorBudgetStatus:
         """Compute current error budget consumption over the full compliance window."""
-        window   = Window(duration=slo.compliance_window)
-        reading  = await self._query_window(slo, window)
-        now      = datetime.utcnow()
+        window  = Window(duration=slo.compliance_window)
+        reading = await self._query_window(slo, window)
+        now     = datetime.now(tz=_UTC)
 
         if not reading.is_valid:
             return ErrorBudgetStatus(
@@ -132,12 +135,9 @@ class BurnRateEvaluator:
                 projected_exhaustion=None,
             )
 
-        # Fraction of the error rate threshold we've consumed
         consumed_pct = (reading.error_rate / slo.error_rate_threshold) * 100.0
         remaining    = max(0.0, slo.total_error_budget_minutes * (1.0 - consumed_pct / 100.0))
-
-        # Burn rate relative to the window (1.0 = right on track to exhaust at end of window)
-        burn_rate = consumed_pct / 100.0
+        burn_rate    = consumed_pct / 100.0
 
         projected: datetime | None = None
         if burn_rate > 1.0 and remaining > 0:
@@ -174,8 +174,8 @@ class BurnRateEvaluator:
         else:
             status = BurnRateStatus.WARNING  if firing else BurnRateStatus.HEALTHY
 
-        fp  = f"{slo.name}:{threshold.name}"
-        now = datetime.utcnow()
+        fp   = f"{slo.name}:{threshold.name}"
+        now  = datetime.now(tz=_UTC)
         prev = self._previous_states.get(fp)
 
         was_firing = prev is not None and prev.is_firing
@@ -191,7 +191,7 @@ class BurnRateEvaluator:
                 threshold.long_window.label,  long_r.burn_rate,
             )
         elif not firing and was_firing:
-            fired_at    = prev.fired_at     # type: ignore[union-attr]
+            fired_at    = prev.fired_at      # type: ignore[union-attr]
             resolved_at = now
             log.info("RESOLVED %s | %s", slo.name, threshold.name)
         else:
@@ -233,6 +233,6 @@ class BurnRateEvaluator:
             error_rate=error_rate,
             good_count=good,
             total_count=total,
-            evaluated_at=datetime.utcnow(),
+            evaluated_at=datetime.now(tz=_UTC),
             backend=self._backend.name,
         )
