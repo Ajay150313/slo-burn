@@ -31,6 +31,8 @@ from src.core.models import (
     SLO,
     SLOIndicator,
     Window,
+    allowed_downtime_minutes,
+    hours_to_budget_exhaustion,
 )
 from src.core.evaluator import BurnRateEvaluator
 from src.rules.templates import get_template, list_templates, TEMPLATES
@@ -440,3 +442,19 @@ class TestDashboard:
         )
         html = render_dashboard_html([make_state("broken", is_firing=True)], [budget], datetime.utcnow())
         assert "Critical" in html
+
+
+class TestBudgetForecast:
+    def test_14_4x_on_30d_is_about_50_hours(self):
+        hours = hours_to_budget_exhaustion(1.0, 14.4, window_days=30)
+        assert abs(hours - 50.0) < 0.1
+
+    def test_half_budget_at_2x_is_180_hours(self):
+        assert hours_to_budget_exhaustion(0.5, 2.0, window_days=30) == 180.0
+
+    def test_zero_burn_is_infinite(self):
+        assert hours_to_budget_exhaustion(0.5, 0.0) == float("inf")
+
+    def test_99_99_allows_about_4_minutes(self):
+        minutes = allowed_downtime_minutes(99.99, window_days=30)
+        assert abs(minutes - 4.32) < 0.01

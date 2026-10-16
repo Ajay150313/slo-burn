@@ -295,6 +295,36 @@ class AlertState:
         return end - self.fired_at
 
 
+def hours_to_budget_exhaustion(
+    budget_remaining_fraction: float,
+    burn_rate: float,
+    window_days: float = 30.0,
+) -> float:
+    """Hours until the error budget is gone at the current burn rate.
+
+    ``burn_rate`` of 1.0 means the remaining budget lasts exactly the
+    SLO window. ``14.4`` on a 30-day SLO is about 50 hours.
+
+    Returns ``inf`` when the burn rate is not consuming budget.
+    """
+    if burn_rate <= 0 or budget_remaining_fraction <= 0:
+        return float("inf")
+    return budget_remaining_fraction * window_days * 24.0 / burn_rate
+
+
+def allowed_downtime_minutes(target_percent: float, window_days: int = 30) -> float:
+    """Allowed downtime in minutes for a target over a rolling window.
+
+    99.99% over 30 days is 4.32 minutes. That is less time than most
+    teams take to acknowledge a page.
+    """
+    if not (0 < target_percent < 100):
+        raise ValueError(f"target_percent must be between 0 and 100, got {target_percent}")
+    if window_days <= 0:
+        raise ValueError(f"window_days must be positive, got {window_days}")
+    return window_days * 24 * 60 * (1.0 - target_percent / 100.0)
+
+
 @dataclass
 class ErrorBudgetStatus:
     """Current error budget health for one SLO."""
@@ -304,6 +334,15 @@ class ErrorBudgetStatus:
     budget_remaining_minutes:  float
     current_burn_rate:         float
     projected_exhaustion:      Optional[datetime]  # None if burn rate ≤ 1.0
+
+    @property
+    def hours_remaining(self) -> float:
+        remaining_fraction = max(0.0, 1.0 - self.budget_consumed_pct / 100.0)
+        return hours_to_budget_exhaustion(
+            remaining_fraction,
+            self.current_burn_rate,
+            window_days=self.slo.window_days,
+        )
 
     @property
     def is_exhausted(self) -> bool:

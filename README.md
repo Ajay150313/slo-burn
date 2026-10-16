@@ -112,6 +112,18 @@ slo-burn serve --config slos.yaml
 Dashboard → `http://localhost:9000`
 Prometheus metrics → `http://localhost:9090/metrics`
 
+Page on time remaining, not just the burn-rate number:
+
+```python
+from src.core.models import hours_to_budget_exhaustion, allowed_downtime_minutes
+
+# 99.99% over 30 days ≈ 4.32 minutes of allowed downtime
+allowed_downtime_minutes(99.99, window_days=30)
+
+# 14.4× burn on a full 30-day budget ≈ 50 hours left
+hours_to_budget_exhaustion(1.0, 14.4, window_days=30)
+```
+
 ---
 
 ## Why multi-window works
