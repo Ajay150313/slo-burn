@@ -4,6 +4,13 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ---
 
+## Unreleased
+
+### Added
+- `hours_to_budget_exhaustion(budget_remaining, burn_rate, window_days)` — hours until the error budget is gone
+- `allowed_downtime_minutes(target, window_days)` — 99.99% over 30 days is 4.32 minutes
+- `ErrorBudgetStatus.hours_remaining` for on-call paging on forecast, not threshold
+
 ## [0.3.0] — 2025-01-15
 
 ### Added
