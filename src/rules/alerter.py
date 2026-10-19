@@ -1,5 +1,5 @@
 # Copyright 2026 Ajay Mulukutla (Ajay150313)
-# MIT License — see LICENSE in the project root
+# Apache-2.0 License — see LICENSE in the project root
 
 
 """

@@ -7,15 +7,15 @@ name = "slo-burn"
 version = "0.3.0"
 description = "Multi-window SLO burn rate alerting — stop alert fatigue, catch every real incident"
 readme = "README.md"
-license = { text = "MIT" }
-authors = [{ name = "slo-burn contributors" }]
+license = { text = "Apache-2.0" }
+authors = [{ name = "Ajay Devineni" }]
 requires-python = ">=3.9"
 keywords = ["sre", "slo", "sli", "burn-rate", "alerting", "reliability", "prometheus", "observability", "devops"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
