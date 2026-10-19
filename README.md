@@ -293,6 +293,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup.
 
 ---
 
+## Use with AI coding agents
+
+An agent skill that teaches coding agents how to use this library is in [`skills/slo-burn/SKILL.md`](skills/slo-burn/SKILL.md).
+
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
