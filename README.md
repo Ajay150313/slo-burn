@@ -2,17 +2,15 @@
 
 **Multi-window SLO burn rate alerting for teams tired of being woken up for nothing.**
 
-[![CI](https://github.com/your-org/slo-burn/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/slo-burn/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/slo-burn.svg)](https://pypi.org/project/slo-burn/)
+[![CI](https://github.com/Ajay150313/slo-burn/actions/workflows/ci.yml/badge.svg)](https://github.com/Ajay150313/slo-burn/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/your-org/slo-burn/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/slo-burn)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 ---
 
 ## The problem
 
-I've been in SRE for eleven years. I've been paged at 3am for a 90-second CPU spike that auto-resolved before I finished unlocking my phone. I've watched teammates burn out. I've seen engineers disable PagerDuty notifications because they'd been conditioned to treat every alert as noise — and then miss the one that took down production for four hours.
+I've spent over a decade in infrastructure and SRE. I've been paged at 3am for a 90-second CPU spike that auto-resolved before I finished unlocking my phone. I've watched teammates burn out. I've seen engineers disable PagerDuty notifications because they'd been conditioned to treat every alert as noise — and then miss the one that took down production for four hours.
 
 The industry data backs this up:
 
@@ -256,22 +254,12 @@ slo_evaluation_timestamp_seconds               # unix timestamp of last evaluati
 ## Docker
 
 ```bash
+docker build -t slo-burn .
 docker run -p 9000:9000 -p 9090:9090 \
   -v $(pwd)/slos.yaml:/etc/slo-burn/slos.yaml \
   -e PD_KEY=your-key \
   -e SLACK_WEBHOOK=https://hooks.slack.com/... \
-  ghcr.io/your-org/slo-burn:latest
-```
-
----
-
-## Kubernetes / Helm
-
-```bash
-helm repo add slo-burn https://your-org.github.io/slo-burn
-helm install slo-burn slo-burn/slo-burn \
-  --set config.prometheusUrl=http://prometheus:9090 \
-  --set secrets.pdKey=your-pd-key
+  slo-burn
 ```
 
 ---
@@ -293,7 +281,7 @@ helm install slo-burn slo-burn/slo-burn \
 
 ## Contributing
 
-Pull requests are welcome. Open issues are tagged [`good first issue`](https://github.com/your-org/slo-burn/issues?q=label%3Agood-first-issue) if you want somewhere to start.
+Pull requests are welcome. Open issues are tagged [`good first issue`](https://github.com/Ajay150313/slo-burn/issues?q=label%3Agood-first-issue) if you want somewhere to start.
 
 **What we need most right now:**
 - New Relic backend (see `src/exporters/prometheus.py` for the interface)
@@ -307,7 +295,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).
 
 ---
 

@@ -5,7 +5,7 @@ Thanks for taking the time. Patches, bug reports, and documentation fixes are al
 ## Dev setup
 
 ```bash
-git clone https://github.com/your-org/slo-burn.git
+git clone https://github.com/Ajay150313/slo-burn.git
 cd slo-burn
 python3 -m venv .venv
 source .venv/bin/activate
@@ -47,7 +47,7 @@ PRs without tests for new behaviour will be asked to add them before merge.
 
 ## What we need most
 
-These are tagged [`good first issue`](https://github.com/your-org/slo-burn/issues?q=label%3Agood-first-issue):
+These are tagged [`good first issue`](https://github.com/Ajay150313/slo-burn/issues?q=label%3Agood-first-issue):
 
 - **New Relic backend** — follow `src/exporters/prometheus.py`, implement the `MetricsBackend` protocol
 - **OpenTelemetry / OTLP backend** — same pattern

@@ -11,14 +11,14 @@
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Email **security@your-org.com** with:
+Use GitHub's [private vulnerability reporting](https://github.com/Ajay150313/slo-burn/security/advisories/new) with:
 
 - What the vulnerability is
 - Steps to reproduce it
 - Potential impact
 - Any suggested fix
 
-You'll get a response within 48 hours. We follow responsible disclosure — patch first, disclosure after.
+You will get an acknowledgement within 5 business days. We follow responsible disclosure — patch first, disclosure after.
 
 ## Important: never put credentials in slos.yaml
 

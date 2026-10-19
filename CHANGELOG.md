@@ -6,6 +6,12 @@ All notable changes are documented here. Format follows [Keep a Changelog](https
 
 ## Unreleased
 
+### Fixed
+- License metadata: `pyproject.toml` declared MIT while the repository is Apache-2.0.
+- Removed placeholder `your-org` links, a nonexistent Helm chart and container image
+  reference; Docker instructions now build the image locally.
+- Added CI (lint, tests on Python 3.9-3.12).
+
 ### Added
 - `hours_to_budget_exhaustion(budget_remaining, burn_rate, window_days)` — hours until the error budget is gone
 - `allowed_downtime_minutes(target, window_days)` — 99.99% over 30 days is 4.32 minutes
