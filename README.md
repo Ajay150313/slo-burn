@@ -8,6 +8,21 @@
 
 ---
 
+## Architecture
+
+![slo-burn architecture](docs/assets/architecture.svg)
+
+A page alert fires only when **both** the short and long windows exceed the multiplier.
+`hours_to_budget_exhaustion` turns that burn rate into time left.
+
+## Example evaluation
+
+![slo-burn example evaluation](docs/assets/dashboard.svg)
+
+These numbers come from `allowed_downtime_minutes(99.99, 30)` and
+`hours_to_budget_exhaustion(budget_remaining_fraction=0.5, burn_rate=14.4)`. They are not a live cluster.
+
+
 ## The problem
 
 I've spent over a decade in infrastructure and SRE. I've been paged at 3am for a 90-second CPU spike that auto-resolved before I finished unlocking my phone. I've watched teammates burn out. I've seen engineers disable PagerDuty notifications because they'd been conditioned to treat every alert as noise — and then miss the one that took down production for four hours.
